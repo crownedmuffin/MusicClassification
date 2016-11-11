@@ -79,4 +79,12 @@ axis([0 fRight(nBanks) 0 max(freqResponse(:))]);title('FilterbankS');
 %
 % YOU NEED TO ADD YOUR CODE HERE
 
-
+K = size(freqResponse,2);
+mfcc = zeros(1,nBanks);
+for p=1:nBanks 
+    for k=1:K 
+        mfcc(p,k)= abs(freqResponse(p,k)*Xn(k))^2;
+    end
+end
+       
+ imagesc(mfcc);

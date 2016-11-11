@@ -1,10 +1,7 @@
-function [song, start, stop] = take_audio(audio_file,time_slice,from_middle)      
+function [song, start, stop] = take_audio(audio_file,time_slice,from_middle)  
+    %Usage: provide path to file, amount of time you want to extract and 
     %Takes chunk of audio (as explicitly required in question 1 and 3)
 
-    %Usage: provide path to file, amount of time you want to extract and
-    %a boolean value for if you want to take out information from the
-    %middle or from the beginning (no other location supported yet)
- 
     %Read audio file
     [stripped_audio, Fs] = audioread(audio_file);
     

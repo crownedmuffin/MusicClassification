@@ -29,6 +29,8 @@ xn = song(s:s+511);
 Y = fft (w.*xn);
 K = N/2 + 1;
 Xn = Y(1:K);
+
+
 % hardwired parameters
 hopSize = fftSize/2;
 nBanks = 40;

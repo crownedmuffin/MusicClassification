@@ -1,0 +1,20 @@
+function [song, start, stop] = take_audio(audio_file,time_slice,from_middle)  
+    %Takes chunk of audio (as explicitly required in question 1 and 3)
+
+    %Read audio file
+    [stripped_audio, Fs] = audioread(audio_file);
+    
+    %Form audio object to easily collect data about song
+    song = audioplayer(stripped_audio,Fs);
+   
+    if not(from_middle)
+        %Extract information from beginning to time "time_sample"
+        start = 1;                          %Indicates beginning
+        stop = song.SampleRate*time_slice;  %Ending time defined by user  
+    else
+        %Take from the middle
+        start = song.TotalSamples/2;
+        %End at specified time after middle of song
+        stop = start + song.SampleRate*time_slice;
+    end    
+end

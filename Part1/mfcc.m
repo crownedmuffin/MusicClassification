@@ -90,15 +90,9 @@ axis([0 fRight(nBanks) 0 max(freqResponse(:))]);title('FilterbankS');
 
 N = 512; %number of samples in frame
 
-%Just set K to the maximum size of freqResponse. The coefficients of the
-%filterbanks are positioned in the freqResponse matrix such that values 
-%will only exist near the values you see in the filterbank plot. Look at the value of 
-%freqResponse if you need that to make sense. The filter bank at Nb = 1 is small, and there
-%are a limited number of nonzero values there, as we would expect. Whereas the
-%filterbank size at the last filter bank is large.
-K = size(freqResponse,2);
 
-question2 = 1;
+
+question2 = 0;
 
     
 %Form audio object to easily collect data about song
@@ -113,6 +107,14 @@ if question2
     %take 512 samples starting from the first non-zero point (add 512 samples to this )
     xn = wav(first_nonzero_index:first_nonzero_index+511);
      
+    %Just set K to the maximum size of freqResponse. The coefficients of the
+    %filterbanks are positioned in the freqResponse matrix such that values 
+    %will only exist near the values you see in the filterbank plot. Look at the value of 
+    %freqResponse if you need that to make sense. The filter bank at Nb = 1 is small, and there
+    %are a limited number of nonzero values there, as we would expect. Whereas the
+    %filterbank size at the last filter bank is large.
+    K = size(freqResponse,2);
+    
     %Compute Fourier transform of audio signal with window of size N = 512
     Y = fft (window.*xn);
     K = N/2 + 1;
@@ -126,8 +128,10 @@ if question2
         %Implement equation (7)
         %k runs from 1 to 257 because there are 257 columns in the
         %freqResponse matrix, which carries the coefficients of the filter.
-        k=0;
-        mfcc(p) = symsum((abs(freqResponse(p,k)*Xn(k))^2),k,1,257);        
+     
+        for k = 1:K
+            mfcc(p) = (abs(freqResponse(p,k)*Xn(k))^2)+mfcc(p);
+        end
     end 
 else
     %number of frames in 24 seconds at sampling rate fs and frame size N
@@ -147,18 +151,33 @@ else
     %Want to start in middle of the song. Gather this data before entering loop
     middleIndex = song.TotalSamples/2;
     
+    %Just set K to the maximum size of freqResponse. The coefficients of the
+    %filterbanks are positioned in the freqResponse matrix such that values 
+    %will only exist near the values you see in the filterbank plot. Look at the value of 
+    %freqResponse if you need that to make sense. The filter bank at Nb = 1 is small, and there
+    %are a limited number of nonzero values there, as we would expect. Whereas the
+    %filterbank size at the last filter bank is large.
+    K = size(freqResponse,2);
+    
     %pull in new frames and process the next 517 frames
     for frameNumber = 1:numFrames
        
         %Take 512 samples. Need to get the start and end of the individual
         %frames we're currently analyzing. Increment beginning of frame by
         %512 after processing previous frame.
-        frameStart = middleIndex+((frameNumber-1)*N);
+        frameStart = ceil(middleIndex+((frameNumber-1)*N)); %needs to be an integer
         frameEnd   = frameStart+511;
 
-        %samples from current frame of interest
-        extracted_audio = wav(frameStart:frameEnd);
-
+        %extract samples from current frame of interest
+        try 
+            extracted_audio = wav(frameStart:frameEnd);
+        catch
+            %This will only trigger if we go over the total amount of
+            %samples. i.e. sample1.wav, is less than 24 seconds, so we
+            %cannot process 24 seconds worth of frames.
+            warning('Total Samples: ' + song.TotalSamples + 'frame end: ' + frameEnd + 'frame start: ' + frameStart)
+        end
+        
         %Just want to make this explicitly clear for my future self.
         xn = extracted_audio;
 
@@ -169,10 +188,17 @@ else
         %Generate mfcc coefficient matrix for each frame and filter bank
         for p=1:nBanks 
             %k is essentially the size of the filterbanks. 
-            blah = symsum((abs(freqResponse(p,q)*Xn(q))^2), q,1,257)
-            mfcc(p,frameNumber) = symsum((abs(freqResponse(p,k)*Xn(k))^2),k,1,257); %k from 1 to 257           
+            for k = 1:K
+                mfcc(p,frameNumber) = (abs(freqResponse(p,k)*Xn(k))^2)+mfcc(p,frameNumber); %k from 1 to 257           
+            end    
         end
     end 
 end %end of if statement
            
- imagesc(mfcc);
+ %imagesc(mfcc);
+
+ imagesc(10*log10(mfcc))
+ xlabel('MFCC Coefficients per Frame'); 
+ ylabel('Filterbank Number');
+ 
+ 

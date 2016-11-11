@@ -25,6 +25,8 @@ audioFileNames = cellstr({audioFiles.name});
 %take_audio input parameters: audio file, amount of time to extract, middle
 %or not middle switch
 
+close all
+
 %Put all song names into a cell array
 songList = {
             '\audio\track201-classical.wav', ...
@@ -42,8 +44,12 @@ songList = {
             '\audio\sample1.wav'
             };
 
+%Song number x 
+songChoice = 11;
  
-[song_object, audio_data, fs ,start, stop] = slice_audio(char(songList(1)),3,1);
+ pathToSong = char(songList(songChoice))
+
+[song_object, audio_data, fs ,start, stop] = slice_audio(pathToSong,3,1);
 %sound(audio_data,fs) %don't use this, you won't be able to pause the music
 %play(song_object,[start,stop])
 
@@ -53,13 +59,17 @@ songList = {
 %Implement the computation of the mfcc coeffcients, as defined in 
 %(7). You simply need to add your code in the MATLAB code in the previous pages.
 
-%fs - given 
-N = 512; %samples per frame
-fftSize = N; %want this to be the number of samples per frame (i think)
+%Values extracted from part 1: fs, song_object, audio_data, fs ,start, stop
 
-% window setup
+%samples per frame
+N = 512;
+
+%want this to be the number of samples per frame (i think)
+fftSize = N;
+
+% create a window
 % w = kaiser(N,beta);
-w = hann(fftSize); %hann(512)
+w = hann(fftSize);
 
 %playblocking(song,[start,stop])
 

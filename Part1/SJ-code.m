@@ -26,6 +26,8 @@ w = kaiser(N,beta);
 s = min(find(song ~= 0));
 xn = song(s:s+511);
 
+sound(xn,fs)
+
 Y = fft (w.*xn);
 K = N/2 + 1;
 Xn = Y(1:K);
@@ -68,9 +70,11 @@ fEquiMel = fRange(fIndex);
 fLeft = fEquiMel(1:nBanks);
 fCentre = fEquiMel(2:nBanks+1);
 fRight = fEquiMel(3:nBanks+2);
+
 % clip filters that leak beyond the Nyquist frequency
 [dummy, tmp.idx] = max(find(fCentre <= fs/2));
 nBanks = min(tmp.idx,nBanks);
+
 % this array contains the frequency response of the nBanks hat filters.
 freqResponse = zeros(nBanks,fftSize/2+1);
 hatHeight = 2./(fRight-fLeft);
@@ -86,7 +90,8 @@ end
 % plot a pretty figure of the frequency response of the filters.
 %figure;set(gca,'fontsize',14);semilogx(linearFreq,freqResponse');
 %axis([0 fRight(nBanks) 0 max(freqResponse(:))]);title('Filterbanks');
-%
+
+
 K = size(freqResponse,2);
 mfcc = zeros(1,nBanks);
 for p=1:nBanks 

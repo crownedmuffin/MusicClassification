@@ -5,6 +5,7 @@
 
 %Solution for Question 1:
 
+%{
 %trying to keep track of each file in the folder
 global audioFiles audioFileNames;
 
@@ -19,54 +20,57 @@ audioFileNames = cellstr({audioFiles.name});
 %end
 
 %currentAudioFile = audioFileNames(4);
+%}
 
-%take_audio input parameters: wav file, amount of time to extract, middle
+%take_audio input parameters: audio file, amount of time to extract, middle
 %or not middle switch
 
-[extracted_audio, start, stop] = take_audio('\audio\track201-classical.wav',3,0);
-%[extracted_audio, start, stop] = take_audio(audioFileNames(4),3,0);
-play(extracted_audio,[start,stop])
+%Put all song names into a cell array
+songList = {
+            '\audio\track201-classical.wav', ...
+            '\audio\track204-classical.wav', ...
+            '\audio\track370-electronic.wav', ...
+            '\audio\track396-electronic.wav', ...
+            '\audio\track437-jazz.wav', ...
+            '\audio\track439-jazz.wav', ...
+            '\audio\track463-metal.wav', ...
+            '\audio\track492-metal', ...
+            '\audio\track547-rock.wav', ...
+            '\audio\track550-rock.wav', ...
+            '\audio\track707-world.wav', ...
+            '\audio\track729-world.wav', ...
+            '\audio\sample1.wav'
+            };
+
+ 
+[song_object, audio_data, fs ,start, stop] = slice_audio(char(songList(1)),3,1);
+%sound(audio_data,fs) %don't use this, you won't be able to pause the music
+%play(song_object,[start,stop])
+
 
 
 %Question 2:
-%Implement the computation of the mfcc coecients, as defined in 
+%Implement the computation of the mfcc coeffcients, as defined in 
 %(7). You simply need to add your code in the MATLAB code in the previous pages.
 
-fs = 11025;
-N = 512; %number of samples in each frame
-fftSize = N;
-%beta = 0.5;
-samples = [60*fs,84*fs];
-[song,fs]= audioread('audio\track201-classical.wav', samples);
-
-%Finding first point where it's not 0 and sampling xn to N-1
+%fs - given 
+N = 512; %samples per frame
+fftSize = N; %want this to be the number of samples per frame (i think)
 
 % window setup
-%w = kaiser(N,beta);
+% w = kaiser(N,beta);
 w = hann(fftSize); %hann(512)
-%
-s = min(find(song ~= 0));
-xn = song(s:s+511);
-
-Y = fft (w.*xn);
-K = N/2 + 1;
-Xn = Y(1:K);
-
-
 
 %playblocking(song,[start,stop])
 
-[x,fs]=audioread('track201-classical.wav');
-fftSize=512;
-w = hann(fftSize);
-y=mfcc(x,fs,512,w);
+y=mfcc(audio_data,fs,fftSize,w);
 
 
 
 %Question 3:
 %Evaluate your MATLAB function mfcc on the 12 audio tracks, and display the output as
 %an image using imagesc. You will use T =24 seconds from the middle of each track and
-%compute a matrix of mfcc coecients of size NB = 40 rows and 24 × 11, 025/512 = 517
+%compute a matrix of mfcc coefficients of size NB = 40 rows and 24 × 11,025/512 = 517
 %columns.
 
 

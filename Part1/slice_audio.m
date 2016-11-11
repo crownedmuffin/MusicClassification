@@ -1,15 +1,19 @@
-function [song, start, stop] = take_audio(audio_file,time_slice,from_middle)      
-    %Takes chunk of audio (as explicitly required in question 1 and 3)
+function [song, audio_data, Fs, start, stop] = slice_audio(audio_filepath,time_slice,from_middle)      
+    %Extracts T seconds from a given song (as explicitly required in question 1 and 3)
 
-    %Usage: provide path to file, amount of time you want to extract and
+    %Usage: 
+    %Inputs: provide path to file, amount of time you want to extract and
     %a boolean value for if you want to take out information from the
     %middle or from the beginning (no other location supported yet)
+    
+    %Outputs:
+    %Song Object, raw audio data, sampling rate, start time, stop time.
  
     %Read audio file
-    [stripped_audio, Fs] = audioread(audio_file);
+    [audio_data, Fs] = audioread(audio_filepath);
     
     %Form audio object to easily collect data about song
-    song = audioplayer(stripped_audio,Fs);
+    song = audioplayer(audio_data,Fs);
    
     if not(from_middle)
         %Extract information from beginning to time "time_sample"

@@ -98,7 +98,7 @@ N = 512; %number of samples in frame
 %filterbank size at the last filter bank is large.
 K = size(freqResponse,2);
 
-question2 = 1;
+question2 = 0;
 
     
 %Form audio object to easily collect data about song
@@ -106,13 +106,6 @@ song = audioplayer(wav,fs);
 
 if question2
     numFrames = 1;
-    
-    %Finding first nonzero sample of song (used for part 1)
-    first_nonzero_index = min(find(wav ~= 0));
-
-    %take 512 samples starting from the first non-zero point (add 512 samples to this )
-    xn = wav(first_nonzero_index:first_nonzero_index+511);
-     
     %Compute Fourier transform of audio signal with window of size N = 512
     Y = fft (window.*xn);
     K = N/2 + 1;
@@ -126,8 +119,7 @@ if question2
         %Implement equation (7)
         %k runs from 1 to 257 because there are 257 columns in the
         %freqResponse matrix, which carries the coefficients of the filter.
-        k=0;
-        mfcc(p) = symsum((abs(freqResponse(p,k)*Xn(k))^2),k,1,257);        
+        mfcc(p) = synsum((abs(freqResponse(p,k)*Xn(k))^2),k,1,257);        
     end 
 else
     %number of frames in 24 seconds at sampling rate fs and frame size N
@@ -169,7 +161,6 @@ else
         %Generate mfcc coefficient matrix for each frame and filter bank
         for p=1:nBanks 
             %k is essentially the size of the filterbanks. 
-            blah = symsum((abs(freqResponse(p,q)*Xn(q))^2), q,1,257)
             mfcc(p,frameNumber) = symsum((abs(freqResponse(p,k)*Xn(k))^2),k,1,257); %k from 1 to 257           
         end
     end 

@@ -1,4 +1,4 @@
-function [mfcc] = mfcc(wav, fs, fftSize, window)
+function [mfcc] = mfcc(wav, fs, fftSize, window,song_path)
 %
 % USAGE
 % [mfcc] = mfcc(wav, fs, fftSize,window)
@@ -197,8 +197,15 @@ end %end of if statement
            
  %imagesc(mfcc);
 
- imagesc(10*log10(mfcc))
+ %As requested, flipping the matrix upside down
+ mfcc_flipped = flipud(mfcc);
+ %mfcc_flipped = mfcc; %for debugging purposes
+ 
+ fig = imagesc(10*log10(mfcc_flipped));
+ title(song_path);
  xlabel('MFCC Coefficients per Frame'); 
  ylabel('Filterbank Number');
+ colorbar;
+ colormap('jet');
  
- 
+

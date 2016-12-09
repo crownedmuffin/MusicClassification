@@ -184,7 +184,7 @@ else
         Y = fft (window.*xn);
         K = N/2 + 1;
         Xn = Y(1:K);
-
+ 
         %Generate mfcc coefficient matrix for each frame and filter bank
         for p=1:nBanks 
             %k is essentially the size of the filterbanks. 

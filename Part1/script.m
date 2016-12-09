@@ -13,7 +13,7 @@ songList = {
             '\audio\track547-rock.wav', ...
             '\audio\track550-rock.wav', ...
             '\audio\track707-world.wav', ...
-            '\audio\track729-world.wav', ...
+            '\audio\track729-world.wav', ... 
             '\audio\sample1.wav'
             }; 
 
@@ -166,7 +166,7 @@ a vector of 12 entries for each frame n.
     of the fourier coefficients
 
     raised 
-
+             |
              |  |  -|- * _  |
              |  | / |*\_/*\ |
              |  |/ *|     *\|
@@ -184,11 +184,42 @@ a vector of 12 entries for each frame n.
 
 %}
 
+
+
+
+
 %Question 5:
 %{
 Evaluate and plot the NPCP for the 12 audio tracks found in
 http://ecee.colorado.edu/~fmeyer/.private/audio.zip
 See Fig. 2 for an example.
 %}
- 
 
+frameSizeForNPCP = 2048;
+windowForNPCP = hann(frameSizeForNPCP);
+
+close all
+songList = {
+            '\audio\track201-classical.wav', ...
+            '\audio\track204-classical.wav', ...
+            '\audio\track370-electronic.wav', ...
+            '\audio\track396-electronic.wav', ...
+            '\audio\track437-jazz.wav', ...
+            '\audio\track439-jazz.wav', ...
+            '\audio\track463-metal.wav', ...
+            '\audio\track492-metal.wav', ...
+            '\audio\track547-rock.wav', ...
+            '\audio\track550-rock.wav', ...
+            '\audio\track707-world.wav', ...
+            '\audio\track729-world.wav', ... 
+            '\audio\sample1.wav'
+            }; 
+for songChoice = 1:12
+    pathToSong = char(songList(songChoice));
+    y=NormPitchClassProfile(pathToSong,0,1);
+end  
+
+
+%Question 6
+%Question 7
+%Question 8

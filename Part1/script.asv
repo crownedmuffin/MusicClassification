@@ -235,7 +235,6 @@ datasetSubfolder = './data/';
 genreSubfolders = dir(datasetSubfolder);
 
 %Ad-hoc solution to get rid of source controlled remnants detected in the folder
-%These are added as the first contents in the struct
 genreSubfolders(1:2) = []; 
 
 genreDistance = zeros(6,6);
@@ -254,20 +253,19 @@ for genre1 = 1:6
         path_to_genre_2_songs = [datasetSubfolder genreSubfolders(genre2).name '/'];
         genre2_songs = dir(path_to_genre_2_songs);
         
-        %Ad-hoc solution to get rid of source controlled remnants detected in the folder
-        genre2_songs(1:2) = []; 
+         %Ad-hoc solution to get rid of source controlled remnants detected in the folder
+    genre1_songs(1:2) = []; 
         
         for genre1_song = 1:25
             
-            %Read audio file
-            song1_filepath = [path_to_genre_1_songs genre1_songs(genre1_song).name]
-            [song1_signal, song1_fs] = slice_audio(song1_filepath,2*60,1)  
+            %read
             
             for genre2_song = 1:25
                 
-                %Read audio file
-                song2_filepath = [path_to_genre_2_songs genre2_songs(genre2_song).name]
-                [song2_signal, song2_fs] = slice_audio(song2_filepath,2*60,1)     
+                
+                
+                song1 = 
+                song2 = 
                 
                 genreDistance(genre1_song,genre2_song) =  (1/(25^2))*songDistance(genre1,song2);
             end

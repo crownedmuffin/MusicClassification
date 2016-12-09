@@ -1,9 +1,18 @@
-function [X] = computeDistance(mfcc1,mfcc2)
+function d = distanceBetweenSongs(song1_path,song2_path)
+    %mfcc coefficiencts of song 1 and 2 respectively
+    
+    %mfcc(wav, fs, fftSize, window)
+    %[song1_signal, ] = audioread(song1_path)
+    
+    mfcc1 = mfcc();
+    mfcc2 = mfcc();
+
     t = zeros(1,36); 
     t(1) =1;t(7:8)=5;t(15:18)= 9;
     t(2) = 2; t( 9:10) = 6; t(19:23) = 10;
     t(3:4) = 3; t(11:12) = 7; t(24:29) = 11;
     t(5:6) = 4; t(13:14) = 8; t(30:36) = 12;
+    
 
     %{
     -----------------------mfcc1-----------------------
@@ -74,8 +83,4 @@ function [X] = computeDistance(mfcc1,mfcc2)
     KL = trace(co1*iCo2) + trace(co2*iCo1) + (mu1-mu2)'*(iCo1+iCo2)*(mu1-mu2);
     gam = 1e2;
     d = 1 - exp(-gam/(KL + eps));
-
-    %imagesc(d)
-    colorbar;
-    colormap('jet');
 end 

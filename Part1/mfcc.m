@@ -100,10 +100,12 @@ end
 %
 % plot a pretty figure of the frequency response of the filters. 
 
+%{
 figure; set(gca,'fontsize',14)
 semilogx(linearFreq,freqResponse'); 
 axis([0 fRight(nBanks) 0 max(freqResponse(:))])
 title('Filterbank');
+%}
 
 %_________________________________________________________
 %        
@@ -122,7 +124,8 @@ end
 %
 % allocate the mel coefficients
 
-mel = zeros(nBanks, nFrames);
+%Fixed overflow bug
+mel = zeros(nBanks, nFrames-1);
 
 %
 % and the power spectrum
@@ -145,7 +148,12 @@ for i=1:nFrames-1,
     chunkIndx = chunkIndx + hopSize;
 end
 
-mfcc = 10*log10(mel); 
+%mfcc = 10*log10(mel); 
+
+%Remove log operation. It will give values of infinity in some cases.
+mfcc = mel;
+
+%{
 
 % plot the power spectrum 
 
@@ -167,6 +175,9 @@ set(gca,'ydir','normal'); caxis(max(caxis)+[-60 0])
 colormap('jet');hold on;colorbar
 
 title('MFCC Representation')
+
+%}
+
 
 return;
 

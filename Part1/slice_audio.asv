@@ -26,16 +26,13 @@ function [audio_data, Fs] = slice_audio(audio_filepath,time_slice,from_middle)
     -----------------------SLICE AUDIO MODIFIED TO EXTRACT 2 MIN FROM SONG-----------------------
     %}
 
-    song_is_long_enough = ((songDuration <= twoMinutes) || ((songDuration/2) <= twoMinutes));
-    
-    if song_is_long_enough && part3
+    if ((songDuration <= twoMinutes) || ((songDuration/2) <= twoMinutes)) && part3
         %Song is less than two minutes long. Use the whole song.
 
         start = 1;
         stop = song.TotalSamples;
     else
-        %Song is greater than two minutes and half of song is greater than
-        %two min.
+        %Song is greater than two minutes.
 
         %Take two min of audio data from song_path starting from the middle
 

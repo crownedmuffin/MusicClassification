@@ -1,4 +1,4 @@
-function d = distanceBetweenSongs(song1_signal,song1_sampleRate,song2_signal,song2_sampleRate)
+function d = distanceBetweenSongs(mfcc1, mfcc2)%song1_signal,song1_sampleRate,song2_signal,song2_sampleRate)
     %mfcc coefficiencts of song 1 and 2 respectively
     
     %mfcc(wav, fs, fftSize, window)
@@ -9,11 +9,11 @@ function d = distanceBetweenSongs(song1_signal,song1_sampleRate,song2_signal,son
     window = hann(frameSize_N);
     
     %Compute mfcc coefficients for each song
-    mfcc1 = mfcc(song1_signal,song1_sampleRate,frameSize_N,window);
-    mfcc1(:,length(mfcc1)) = '';
+    %mfcc1 = mfcc(song1_signal,song1_sampleRate,frameSize_N,window);
+    %mfcc1(:,length(mfcc1)) = '';
     
-    mfcc2 = mfcc(song2_signal,song2_sampleRate,frameSize_N,window);
-    mfcc2(:,length(mfcc2)) = '';
+    %mfcc2 = mfcc(song2_signal,song2_sampleRate,frameSize_N,window);
+    %mfcc2(:,length(mfcc2)) = '';
     
     %Redefinition of filter bank
     t = zeros(1,36); 
@@ -72,17 +72,17 @@ function d = distanceBetweenSongs(song1_signal,song1_sampleRate,song2_signal,son
 
     %Going to include implementation of Professor Meyer's code here:
 
-    mu1 = mean(mfcc1,1);
-    mu2 = mean(mfcc2,1);
+    mu1 = mean(mfcc1,2);
+    mu2 = mean(mfcc2,2);
 
-    co1 = cov(mfcc1);
-    co2 = cov(mfcc2);
+    co1 = cov(mfcc1');
+    co2 = cov(mfcc2');
     
     try
-       tic
+       %tic
             iCo1 = pinv(co1);
             iCo2 = pinv(co2);
-        toc
+        %toc
     catch
         warning('Pseudo-Inverse not working.')
     end
@@ -105,9 +105,9 @@ function d = distanceBetweenSongs(song1_signal,song1_sampleRate,song2_signal,son
         ico2 = pinv(co2);                    
     %}
 
-    tic
+    %tic
         KL = trace(co1*iCo2) + trace(co2*iCo1) + (mu1-mu2)'*(iCo1+iCo2)*(mu1-mu2);
-    toc
+    %toc
     gam = 1e2;
     d = 1 - exp(-gam/(KL + eps));
 end 

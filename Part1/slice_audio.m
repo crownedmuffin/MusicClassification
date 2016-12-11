@@ -7,7 +7,7 @@ function [audio_data, Fs] = slice_audio(audio_filepath,time_slice,from_middle)
     %middle or from the beginning (no other location supported yet)
     
     %Outputs:
-    %Song Object, raw audio data, sampling rate, start time, stop time.
+    %audio_data = audio_data
     
     %Software switch to indicate we're working with part 3 of final project
     part3 = 1;
@@ -17,28 +17,28 @@ function [audio_data, Fs] = slice_audio(audio_filepath,time_slice,from_middle)
     
     %Form audio object to easily collect data about song
     song = audioplayer(audio_data,Fs);
+    
+    %Song duration in seconds
     songDuration = song.TotalSamples/song.SampleRate;
     
-    %amount of seconds in two minutes
-    twoMinutes = 2*60;
+    %Assume song will always be long enough (for now)
+    song_is_long_enough = 1;
 
     %{
     -----------------------SLICE AUDIO MODIFIED TO EXTRACT 2 MIN FROM SONG-----------------------
     %}
-
-    song_is_long_enough = ((songDuration <= twoMinutes) || ((songDuration/2) <= twoMinutes));
     
-    if song_is_long_enough && part3
-        %Song is less than two minutes long. Use the whole song.
+    %Criteria for a good song: we can extract two minutes starting at
+    %middle of song
+    if from_middle
+        song_is_long_enough = ((songDuration/2) >= time_slice);
+    end
+    
 
-        start = 1;
-        stop = song.TotalSamples;
-    else
-        %Song is greater than two minutes and half of song is greater than
-        %two min.
+    if song_is_long_enough && from_middle && part3
+        %We can extract two minutes starting at middle of song.
 
         %Take two min of audio data from song_path starting from the middle
-
         %{
             Definitions of variables below:
 
@@ -59,10 +59,23 @@ function [audio_data, Fs] = slice_audio(audio_filepath,time_slice,from_middle)
             stop = start + song.SampleRate*time_slice;
         end
         
-        try
-            audio_data = audio_data(start:stop);
-        catch
-            warning('check indices. is song 2min long?')
-        end
-    end    
+        
+    elseif part3 && ~song_is_long_enough
+        %If working on part 3, and song is not long enough...
+        %Cannot extract two minutes starting from middle. Use the whole song.
+        start = 1;
+        stop = song.TotalSamples;
+    elseif ~part3 && ~from_miffle
+        %Normal audio slice. Take amount of time specified by user starting
+        %at beginning
+        start = 1;
+        stop = song.SampleRate*time_slice;
+    end
+    
+    %Slice the audio
+    try
+        audio_data = audio_data(start:stop);
+    catch
+        warning('Could not slice audio. Is song long enough?')
+    end
 end

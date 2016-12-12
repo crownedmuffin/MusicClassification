@@ -64,7 +64,7 @@ end
 
 %Pre-load chroma coefficients 
 try
-    load('precomputed_chroma_value.mat')
+    load('precomputed_chroma_values.mat')
     need_to_compute_chroma = 0;
 catch
     warning('File: precomputed_chroma_values.mat not present.')

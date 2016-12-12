@@ -109,5 +109,6 @@ function d = distanceBetweenSongs(mfcc1, mfcc2)%song1_signal,song1_sampleRate,so
         KL = trace(co1*iCo2) + trace(co2*iCo1) + (mu1-mu2)'*(iCo1+iCo2)*(mu1-mu2);
     %toc
     gam = 1e2;
+    %eps is the floating point relative accuracy
     d = 1 - exp(-gam/(KL + eps));
 end 

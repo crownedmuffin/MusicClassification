@@ -40,7 +40,7 @@ ww = 2*pi*[0:(lengthFFT-1)]*samplingRate/lengthFFT;
 
 for ifrm = 1:nFrames
     
-    u = signal((ifrm-1)*(frameSize2) + [1:(frameSize)]);
+    u = signal((ifrm-1)*(frameSize2) + [1:(frameSize)])';
 
     wu = win.*u;
     du = dwin.*u;

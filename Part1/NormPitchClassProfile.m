@@ -1,6 +1,6 @@
-function [PCP, NPCP] = NormPitchClassProfile(song_path, evaluateOneFrame, evaluateWholeSong)
+function NPCP = NormPitchClassProfile(wav)
     
-    [wav]= audioread(song_path);
+    %[wav]= audioread(song_path);
 
     %Number of notes in an octave
     notes_in_an_octave = 12;
@@ -8,8 +8,8 @@ function [PCP, NPCP] = NormPitchClassProfile(song_path, evaluateOneFrame, evalua
     %Sampling rate of songs in Hz
     fs = 11025;
 
-    %Frame size. Want a frame of size 2048
-    frameSize_N = 2048;
+    %Frame size. Want a frame of size 2048. 512 for part 3
+    frameSize_N = 512;
 
     songSize = size(wav,1);
 
@@ -222,6 +222,7 @@ function [PCP, NPCP] = NormPitchClassProfile(song_path, evaluateOneFrame, evalua
 
 
    %Plot result
+   %%{
     NPCP_flipped = flipud(NPCP);
     fig = imagesc(10*log10(NPCP_flipped))
     %fig = imagesc(10*log10(NPCP))
@@ -242,4 +243,6 @@ function [PCP, NPCP] = NormPitchClassProfile(song_path, evaluateOneFrame, evalua
     
     fileLocation = [song_path '.png'];
     saveas(fig,fileLocation)
+  %%}
+   
 end

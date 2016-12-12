@@ -1,29 +1,51 @@
+%--------------------------------------------------------------------------
+%                       VARIABLE/MATRIX INITIALIZATION
+%--------------------------------------------------------------------------
+
+
 numberOfSongs = 150;
 numberOfSongsInFolder = 25;
 numberOfGenres = 6;
 
 
-%NOTE: Matlab must be operating in the folder containing this script for the
-%code below to work. Will need to eliminate this dependency sometime.
+%IMPORTANT: Matlab must be operating in the folder containing for the
+%following two lines to work. Will need to eliminate this dependency sometime.
 datasetSubfolder = './data/';
 genreSubfolders = dir(datasetSubfolder);
 
-%Ad-hoc solution to get rid of source controlled remnants detected in the folder
-%These are added as the first contents in the struct
+%Ad-hoc solution to get rid of source controlled remnants detected in 
+%the folder. These are added as the first contents in the struct
 genreSubfolders(1:2) = []; 
 
 %Amount of seconds in two minutes
 twoMinutes = 2*60;
 
-%frame size shall be 512 as described in project
+%frame size shall be 512 as described in part 3
 frameSize_N = 512;
 window = hann(frameSize_N);
 
-%Switch indicating that we need to compute mfcc values 
-need_to_compute_mfcc = 1;
+%Matrix to contain info of average distance from genreX to genreY
+avgGenreDistanceUsingMFCC = zeros(numberOfGenres,numberOfGenres);
+avgGenreDistanceUsingChroma = zeros(numberOfGenres,numberOfGenres);
 
+%Matrix to contain info of distance of songX from songY
+songDistancesUsingMFCC = zeros(numberOfSongs,numberOfSongs);
+songDistancesUsingChroma = zeros(numberOfSongs,numberOfSongs);
 
+%Data structure to hold all precomputed mfcc values
+precomputed_mfcc_values = struct('result',[]);
+
+%Data structure to hold all precomputed chroma values
+precomputed_chroma_values = struct('result',[]);
+
+%Data structure holding the filepaths to all songs to be analyzed
 song = struct('filepath',[]);
+
+%--------------------------------------------------------------------------
+%                               COMPUTATIONS
+%--------------------------------------------------------------------------
+%Catalog the filepaths to each song
+
 for i = 1:numberOfGenres
     %Get path to genre subfolder
     path_to_genre_subfolders = [datasetSubfolder genreSubfolders(i).name '/'];
@@ -33,17 +55,14 @@ for i = 1:numberOfGenres
     songs_in_subfolder(1:2) = [];
     
     for j = 1:25
-       
         %Create an index for each song. 
         songIndex = ((i-1)*25) + j;
-        
-         %Catalog song path in a struct
+        %Catalog song path in a struct
         song(songIndex).filepath = [path_to_genre_subfolders songs_in_subfolder(j).name];
     end
 end
 
-precomputed_mfcc_values = struct('result',[]);
-
+%Pre-load MFCC coefficients 
 try
     load('precomputed_mfcc_values.mat')
     need_to_compute_mfcc = 0;
@@ -53,7 +72,8 @@ catch
 end
 
 
-%Compute mfcc values if we don't have pre-loaded values. Should take about 1.5 minutes on a dual core laptop.
+%Pre-Compute MFCC coefficients if no values can be preloaded 
+%(1.5 minutes using a i7-6700U dual core laptop) 
 if need_to_compute_mfcc
     tic
     for i = 1:numberOfGenres
@@ -70,18 +90,9 @@ if need_to_compute_mfcc
     toc
 end
 
-%Average distance across genres
-avgGenreDistance = zeros(numberOfGenres,numberOfGenres);
-
-%Matrix containing the distance each song is from each other
-songDistances = zeros(numberOfSongs,numberOfSongs);
-
-currentCompare = [0 0 0 0];
-prevCompare = [0 0 0 0];
-
-
-%Computing distance(songX,songY)
-
+%--------------------------------------------------------------------------
+%Computing the Individial and Average Distance Matrices
+%--------------------------------------------------------------------------
 tic
 for genreX = 1:6
     for songX = 1:25
@@ -93,24 +104,33 @@ for genreX = 1:6
                 songYIndexOffset = ((genreY-1)*25);
                 songYIndex = songYIndexOffset + songY;
                 
+                %Code used for debugging
                 %fprintf('genreX = %d, songX = %d, genreY = %d, songY = %d\n',genreX,songX, genreY, songY)
                 %fprintf('distance(%d,%d)\n\n',songXIndex,songYIndex)
+                
+                %----------------------------------------------------------
+                %Compute Distances using MFCC coefficients
+                %----------------------------------------------------------
                 try
-                 songDistances(songXIndex,songYIndex) = distanceBetweenSongs(precomputed_mfcc_values(songXIndex).result, ...
-                                                                             precomputed_mfcc_values(songYIndex).result);
-                 %Map values to other side of diagonol for a completed
-                 %matrix
-                 songDistances(songYIndex,songXIndex) = songDistances(songXIndex,songYIndex);
+                 songDistancesUsingMFCC(songXIndex,songYIndex) = ...
+                 distanceBetweenSongs(precomputed_mfcc_values(songXIndex).result, ...
+                                      precomputed_mfcc_values(songYIndex).result);
+                                  
+                 %Map values to other side of diagonol to complete the matrix
+                 songDistancesUsingMFCC(songYIndex,songXIndex) = songDistancesUsingMFCC(songXIndex,songYIndex);
                 catch
                     warning('Something is wrong.')
                     fprintf('Trouble computing songX = %d, songY = %d',songXIndex,songYIndex);
                 end
-                
-                avgGenreDistance(genreX,genreY) = songDistances(songXIndex,songYIndex)...
-                                                  + avgGenreDistance(genreX,genreY);
-                                              
-                avgGenreDistance(genreY,genreX) = avgGenreDistance(genreX,genreY);
+                avgGenreDistanceUsingMFCC(genreX,genreY) = songDistancesUsingMFCC(songXIndex,songYIndex)...
+                                                  + avgGenreDistanceUsingMFCC(genreX,genreY);
+                %Map values to it's reflection across the matrix's diagonol                              
+                avgGenreDistanceUsingMFCC(genreY,genreX) = avgGenreDistanceUsingMFCC(genreX,genreY);
                
+                %----------------------------------------------------------
+                %Compute Distances using chroma
+                %----------------------------------------------------------
+                
             end
         end
      end
@@ -119,15 +139,21 @@ toc
 
 %Compute the average distance: divide by number of data points used to 
 %compute the total distances (625)
-avgGenreDistance = (1/(25^2))*avgGenreDistance;
+avgGenreDistanceUsingMFCC = (1/(25^2))*avgGenreDistanceUsingMFCC;
 
 
 figure
-fig1 = imagesc(songDistances);
+fig1 = imagesc(songDistancesUsingMFCC);
+title('Song Distance Matrix Using MFCC Values');
+ylabel('Songs by Index Number');
+xlabel('Songs by Index Number')
 colormap('jet')
 colorbar
 
 figure
-fig2 = imagesc(avgGenreDistance);
+fig2 = imagesc(avgGenreDistanceUsingMFCC);
+title('Average Genre Distance Matrix Using MFCC Values');
+ylabel('Genre by Genre Number');
+xlabel('Genre by Genre Number');
 colormap('jet')
 colorbar

@@ -1,0 +1,20 @@
+function [max_avg_genre_distance optimal_gamma_values] = find_optimal_gamma_values(avg_genre_distance_matrix)
+%Gamma value used in computing the avg_genre_distance_matrix values
+gamma_value_used_to_compute_avg_distance_matrix = 100;
+
+%Need to solve for the average KL value (refer to equation 24)
+average_KL = (-gamma_value_used_to_compute_avg_distance_matrix./log(1-avgGenreDistanceUsingMFCC))-eps;
+
+optimal_gamma_values = zeros(6,6);
+distance = zeros(6,6);
+max_avg_genre_distance_values = zeros(6,6);
+
+for gamma = 10:100
+    
+   distance = abs(1 - exp(-gamma./(average_KL + eps)));
+   max_occurances = distance > max_avg_genre_distance_values;
+   max_avg_genre_distance_values = max_occurances.*
+   
+end
+
+end

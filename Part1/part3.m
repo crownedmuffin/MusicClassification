@@ -142,7 +142,7 @@ for genreX = 1:6
                 try
                  songDistancesUsingMFCC(songXIndex,songYIndex) = ...
                  distanceBetweenSongs(precomputed_mfcc_values(songXIndex).result, ...
-                                      precomputed_mfcc_values(songYIndex).result);
+                                      precomputed_mfcc_values(songYIndex).result,1);
                                   
                  %Map values to other side of diagonol to complete the matrix
                  songDistancesUsingMFCC(songYIndex,songXIndex) = songDistancesUsingMFCC(songXIndex,songYIndex);
@@ -184,6 +184,8 @@ toc
 avgGenreDistanceUsingMFCC = (1/(25^2))*avgGenreDistanceUsingMFCC;
 avgGenreDistanceUsingChroma = (1/(25^2))*avgGenreDistanceUsingChroma;
 
+[max_values_mfcc, optimal_gamma_mfcc]= find_optimal_gamma_values(avgGenreDistanceUsingMFCC);
+[max_values_chroma, optimal_gamma_chroma]= find_optimal_gamma_values(avgGenreDistanceUsingChroma);
 
 figure
 fig1 = imagesc(max_values_chroma)
